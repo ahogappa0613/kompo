@@ -14,8 +14,6 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 2.6.0"
   spec.required_rubygems_version = ">= 3.3.11"
 
-  spec.metadata["allowed_push_host"] = "Set to your gem server 'https://github.com/ahogappa0613/kompo'"
-
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/ahogappa0613/kompo"
   spec.metadata["changelog_uri"] = "https://github.com/ahogappa0613/kompo"
