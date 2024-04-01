@@ -1,0 +1,39 @@
+#include <ruby.h>
+#include <string.h>
+
+extern char *get_kompo_patch(void);
+extern void ruby_init_ext(const char *name, void (*init)(void));
+extern void Init_kompo_fs(void);
+extern char *get_start_file_name(void);
+<% exts.each do |(_, func)| %>
+extern void <%= func %>(void);
+<% end %>
+void Init_gems(void)
+{
+  <% exts.each do |(so_path, func)| %>
+    ruby_init_ext("<%= so_path %>", <%= func %>);
+  <% end %>
+}
+
+int main(int argc, char **argv)
+{
+  int c = 3;
+
+  // HACK: argv[0] is rewritten and reused by setproctitle()
+  argv[1] = "-e";
+  argv[2] = get_kompo_patch();
+
+  ruby_sysinit(&c, &argv);
+
+  RUBY_INIT_STACK;
+  ruby_init();
+
+  Init_kompo_fs();
+  Init_gems();
+
+  void *node = ruby_options(c, argv);
+
+  // set $0
+  ruby_script(get_start_file_name());
+  return ruby_run_node(node);
+}

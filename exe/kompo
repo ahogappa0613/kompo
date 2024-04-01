@@ -1,0 +1,48 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/kompo'
+require 'optparse'
+
+option = Kompo::Option.new
+
+option.on('-e VAL', '--entrypoint=VAL') { |v| option.entrypoint = v }
+option.on('-o VAL', '--output=VAL') { |v| option.output = v }
+option.on('--[no-]gemfile') { |v| option.gemfile = v }
+option.on('--[no-]stdlib') { |v| option.stdlib = v }
+option.on('--dest-dir=VAL') { |v| option.dest_dir = v }
+option.on('--ruby-src-path=VAL') { |v| option.ruby_src_path = v }
+option.on('--cache-bundle-path=VAL') { |v| option.cache_bundle_path = v }
+option.on('--ruby-version=VAL') { |v| option.ruby_version = v }
+# option.on('--compress') { |v| option.compress = v }
+
+Kompo::Tasks.cd_work_dir(option) do |task|
+  task.clone_ruby_src
+
+  task.fs_cli
+
+  task.make_main_c
+
+  task.packing
+
+  task.copy_to_dest_dir
+end
+
+puts 'info: Finish kompo!'
+
+require 'debug'
+ module Kernel
+   def require(path)
+     debugger
+   end
+   def autoload(const, file)
+     Object.autoload(const, file)
+   end
+ end
+
+ class Module
+   alias original_autoload autoload
+   def autoload(const_name, file)
+      original_autoload(const_name, file)
+   end
+  end
+autoload(:Hoge, 'make_main.rb')
