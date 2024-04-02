@@ -12,12 +12,12 @@ module Kompo
 
   class Option
     extend Forwardable
-    attr_accessor :entrypoint, :output_name, :gemfile, :stdlib, :dest_dir, :ruby_src_path, :cache_bundle_path, :ruby_version, :compress, :context, :args
+    attr_accessor :entrypoint, :output, :gemfile, :stdlib, :dest_dir, :ruby_src_path, :cache_bundle_path, :ruby_version, :compress, :context, :args
     delegate %i[on] => :@opt
 
     def initialize(dir = Dir.getwd, opt = OptionParser.new)
       @entrypoint = File.join(dir, 'main.rb')
-      @output_name = File.basename(dir)
+      @output = File.basename(dir)
       @gemfile = true
       @stdlib = true
       @dest_dir = dir
@@ -55,7 +55,7 @@ module Kompo
     extend Forwardable
     attr_reader :task, :fs, :work_dir, :ruby_src_dir, :ruby_pc, :ruby_bin, :extinit_o, :encinit_o, :lib_ruby_static_dir, :bundle_setup, :bundle_ruby, :std_libs, :gem_libs
 
-    delegate %i[entrypoint output_name gemfile stdlib dest_dir ruby_src_path cache_bundle_path ruby_version compress context args] => :@option
+    delegate %i[entrypoint output gemfile stdlib dest_dir ruby_src_path cache_bundle_path ruby_version compress context args] => :@option
     delegate %i[komop_cli lib_kompo_dir] => :@fs
 
     def initialize(option, dir)
@@ -213,14 +213,14 @@ module Kompo
         '-lruby-static',
         get_libs,
         '-o',
-        output_name
+        output
       ].join(' ')
 
       exec_command command, 'Packing'
     end
 
     def copy_to_dest_dir
-      command = ['cp', '-f', output_name, dest_dir].join(' ')
+      command = ['cp', '-f', output, dest_dir].join(' ')
       exec_command command, 'Copy to dest dir'
     end
 
