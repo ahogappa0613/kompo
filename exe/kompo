@@ -28,21 +28,3 @@ Kompo::Tasks.cd_work_dir(option) do |task|
 end
 
 puts 'info: Finish kompo!'
-
-require 'debug'
- module Kernel
-   def require(path)
-     debugger
-   end
-   def autoload(const, file)
-     Object.autoload(const, file)
-   end
- end
-
- class Module
-   alias original_autoload autoload
-   def autoload(const_name, file)
-      original_autoload(const_name, file)
-   end
-  end
-autoload(:Hoge, 'make_main.rb')
