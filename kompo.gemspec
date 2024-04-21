@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors = ["Sho Hirano"]
   spec.email = ["ahogappa@gmail.com"]
 
-  spec.summary = "Write a short summary, because RubyGems requires one."
-  spec.description = "Write a longer description or delete this line."
+  spec.summary = "A tool to pack Ruby and Ruby scripts in one binary."
+  spec.description = "A tool to pack Ruby and Ruby scripts in one binary. This tool is still under development."
   spec.homepage = "https://github.com/ahogappa0613/kompo"
   spec.required_ruby_version = ">= 2.6.0"
   spec.required_rubygems_version = ">= 3.3.11"
