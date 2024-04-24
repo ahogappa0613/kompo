@@ -203,7 +203,7 @@ module Kompo
         '-O3',
         '-Wall',
         'main.c',
-        'exts/**/*.o',
+        Dir.glob('exts/**/*.o').join(' '),
         'fs.o',
         "#{lib_ruby_static_dir.nil? ? '' : '-L' + lib_ruby_static_dir}",
         "#{lib_kompo_dir.nil? ? '' : '-L' + lib_kompo_dir}",
