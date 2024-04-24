@@ -9,4 +9,5 @@
 .DS_Store
 kompo-fs
 sample.db
-sample/sample
+samples/hello/hello
+samples/sinatra_and_sqlite/sinatra_and_sqlite
