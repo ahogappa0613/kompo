@@ -165,33 +165,35 @@ module Kompo
       require 'erb'
 
       exts = []
-      Dir.glob(File.join(bundle_ruby, get_semantic_ruby_version, 'gems/**/extconf.rb')).each do |makefile_dir|
-        dir_name = File.dirname(makefile_dir)
-        makefile = File.join(dir_name, 'Makefile')
-        if File.exist?(cargo_toml = File.join(dir_name, 'Cargo.toml'))
-          command = [
-            'cargo',
-            'rustc',
-            '--release',
-            '--crate-type=staticlib',
-            '--target-dir',
-            'target',
-            "--manifest-path=#{cargo_toml}",
-          ].join(' ')
-          exec_command command, 'cargo build'
-          copy_targets = Dir.glob(File.join(dir_name, 'target/release/*.a'))
-        else
-          objs = File.read(makefile).scan(/OBJS = (.*\.o)/).join(' ')
-          command = ['make', '-C', dir_name, objs, '--always-make'].join(' ')
-          exec_command command, 'make'
-          copy_targets = objs.split(' ').map { File.join(dir_name, _1) }
-        end
+      if gemfile
+        Dir.glob(File.join(bundle_ruby, get_semantic_ruby_version, 'gems/**/extconf.rb')).each do |makefile_dir|
+          dir_name = File.dirname(makefile_dir)
+          makefile = File.join(dir_name, 'Makefile')
+          if File.exist?(cargo_toml = File.join(dir_name, 'Cargo.toml'))
+            command = [
+              'cargo',
+              'rustc',
+              '--release',
+              '--crate-type=staticlib',
+              '--target-dir',
+              'target',
+              "--manifest-path=#{cargo_toml}",
+            ].join(' ')
+            exec_command command, 'cargo build'
+            copy_targets = Dir.glob(File.join(dir_name, 'target/release/*.a'))
+          else
+            objs = File.read(makefile).scan(/OBJS = (.*\.o)/).join(' ')
+            command = ['make', '-C', dir_name, objs, '--always-make'].join(' ')
+            exec_command command, 'make'
+            copy_targets = objs.split(' ').map { File.join(dir_name, _1) }
+          end
 
-        dir = FileUtils.mkdir_p('exts/' + File.basename(dir_name)).first
-        FileUtils.cp(copy_targets, dir)
-        prefix = File.read(makefile).scan(/target_prefix = (.*)/).join.delete_prefix('/')
-        target_name = File.read(makefile).scan(/TARGET_NAME = (.*)/).join
-        exts << [File.join(prefix, "#{target_name}.so").delete_prefix('/'), "Init_#{target_name}"]
+          dir = FileUtils.mkdir_p('exts/' + File.basename(dir_name)).first
+          FileUtils.cp(copy_targets, dir)
+          prefix = File.read(makefile).scan(/target_prefix = (.*)/).join.delete_prefix('/')
+          target_name = File.read(makefile).scan(/TARGET_NAME = (.*)/).join
+          exts << [File.join(prefix, "#{target_name}.so").delete_prefix('/'), "Init_#{target_name}"]
+        end
       end
 
       File.write("main.c", ERB.new(File.read(File.join(__dir__, 'main.c.erb'))).result(binding))
