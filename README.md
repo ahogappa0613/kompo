@@ -1,17 +1,10 @@
 # Kompo
-
-TODO: Delete this and the text below, and describe your gem
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/kompo`. To experiment with that code, run `bin/console` for an interactive prompt.
+A tool to pack Ruby and Ruby scripts in one binary. This tool is still under development.
 
 ## Installation
-Install the gem and add to the application's Gemfile by executing:
-
-    $ bundle add kompo
-
-If bundler is not being used to manage dependencies, install the gem by executing:
-
-    $ gem install kompo
+```sh
+$ gem install kompo
+```
 
 ## Usage
 
@@ -24,13 +17,25 @@ $ brew tap ahogappa0613/kompo-vfs https://github.com/ahogappa0613/kompo-vfs.git
 $ brew install ahogappa0613/kompo-vfs/kompo-vfs
 ```
 
-### Quick Start
-If you want to try it out, `cd` to the `sample/` directory and execute the following:
+### Building
+To build komp-vfs, you need to have cargo installation.
 ```sh
-$ kompo
+$ git clone https://github.com/ahogappa0613/kompo-vfs.git
+$ cd kompo-vfs
+$ cargo build --release
 ```
-This will read the Gemfile in the directory and create an executable file with `main.rb` as the entry point in the same directory as `./sample` in the same directory.
+Set environment variables
+```sh
+$ KOMPO_CLI=/path/to/kompo-vfs/target/release/kompo-cli
+$ LIB_KOMPO_DIR=/path/to/kompo-vfs/target/release
+```
 
+## examples
+
+* hello
+  * simple hello world script.
+* sinatra_and_sqlite
+  * sinatra app with sqlite3 with Gemfile.
 
 
 ## Development
