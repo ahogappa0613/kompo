@@ -18,7 +18,7 @@ module Kompo
     def initialize(dir = Dir.getwd, opt = OptionParser.new)
       @entrypoint = File.join(dir, 'main.rb')
       @output = File.basename(dir)
-      @gemfile = true
+      @gemfile = File.exist?(File.join(Dir.pwd, 'Gemfile'))
       @stdlib = true
       @dest_dir = dir
       @ruby_src_path = nil
