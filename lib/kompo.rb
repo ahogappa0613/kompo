@@ -12,14 +12,14 @@ module Kompo
 
   class Option
     extend Forwardable
-    attr_accessor :entrypoint, :output, :gemfile, :stdlib, :dest_dir, :ruby_src_path, :cache_bundle_path, :ruby_version, :compress, :context, :args, :use_group
+    attr_accessor :entrypoint, :output, :gemfile, :ignore_stdlib, :dest_dir, :ruby_src_path, :cache_bundle_path, :ruby_version, :compress, :context, :args, :use_group
     delegate %i[on] => :@opt
 
     def initialize(dir = Dir.getwd, opt = OptionParser.new)
       @entrypoint = File.join(dir, 'main.rb')
       @output = File.basename(dir)
       @gemfile = File.exist?(File.join(Dir.getwd, 'Gemfile'))
-      @stdlib = true
+      @ignore_stdlib = []
       @dest_dir = dir
       @ruby_src_path = nil
       @cache_bundle_path = nil
@@ -37,6 +37,7 @@ module Kompo
       option.on('-o VAL', '--output=VAL') { |v| option.output = v }
       option.on('-g', '--use-group=VAL') { |v| option.use_group = v }
       option.on('--[no-]gemfile') { |v| option.gemfile = v }
+      option.on('--ignore-stdlib=VAL', Array) { |v| option.ignore_stdlib = v }
       option.on('--dest-dir=VAL') { |v| option.dest_dir = v }
       option.on('--ruby-src-path=VAL') { |v| option.ruby_src_path = v }
       option.on('--cache-bundle-path=VAL') { |v| option.cache_bundle_path = v }
@@ -71,7 +72,7 @@ module Kompo
     extend Forwardable
     attr_reader :task, :fs, :work_dir, :ruby_src_dir, :ruby_pc, :ruby_bin, :extinit_o, :encinit_o, :lib_ruby_static_dir, :bundle_setup, :bundle_ruby, :std_libs, :gem_libs
 
-    delegate %i[entrypoint output gemfile stdlib dest_dir ruby_src_path cache_bundle_path ruby_version compress context args use_group] => :@option
+    delegate %i[entrypoint output gemfile ignore_stdlib dest_dir ruby_src_path cache_bundle_path ruby_version compress context args use_group] => :@option
     delegate %i[komop_cli lib_kompo_dir] => :@fs
 
     def initialize(option, dir)
@@ -293,9 +294,7 @@ module Kompo
         load_paths += gem_libs
       end
 
-      if stdlib
-        load_paths += std_libs
-      end
+      load_paths += std_libs
 
       load_paths
     end
@@ -306,11 +305,11 @@ module Kompo
          .reject { _1 =~ /win32/ } # TODO
          .map { File.dirname(_1) }
          .map { _1.split("#{ruby_src_dir}/ext/")[1] }
+         .reject { ignore_stdlib.include?(_1) }
          .join(',')
     end
 
     def std_libs
-      return [] unless stdlib
       return @std_libs unless @std_libs.empty?
 
       command = ["#{ruby_bin}", '-e', "'puts $:'"].join(' ')
