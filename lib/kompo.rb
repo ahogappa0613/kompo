@@ -31,6 +31,21 @@ module Kompo
       @opt = opt
     end
 
+    def self.default
+      option = new
+      option.on('-e VAL', '--entrypoint=VAL') { |v| option.entrypoint = v }
+      option.on('-o VAL', '--output=VAL') { |v| option.output = v }
+      option.on('-g', '--use-group=VAL') { |v| option.use_group = v }
+      option.on('--[no-]gemfile') { |v| option.gemfile = v }
+      option.on('--dest-dir=VAL') { |v| option.dest_dir = v }
+      option.on('--ruby-src-path=VAL') { |v| option.ruby_src_path = v }
+      option.on('--cache-bundle-path=VAL') { |v| option.cache_bundle_path = v }
+      option.on('--ruby-version=VAL') { |v| option.ruby_version = v }
+      # option.on('--compress') { |v| option.compress = v }
+
+      option
+    end
+
     def build
       @opt.parse!(ARGV)
 
