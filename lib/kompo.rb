@@ -12,7 +12,7 @@ module Kompo
 
   class Option
     extend Forwardable
-    attr_accessor :entrypoint, :output, :gemfile, :stdlib, :dest_dir, :ruby_src_path, :cache_bundle_path, :ruby_version, :compress, :context, :args
+    attr_accessor :entrypoint, :output, :gemfile, :stdlib, :dest_dir, :ruby_src_path, :cache_bundle_path, :ruby_version, :compress, :context, :args, :use_group
     delegate %i[on] => :@opt
 
     def initialize(dir = Dir.getwd, opt = OptionParser.new)
@@ -25,6 +25,7 @@ module Kompo
       @cache_bundle_path = nil
       @ruby_version = "v#{RUBY_VERSION.gsub('.', '_')}"
       @compress = false
+      @use_group = 'production'
 
       @context = dir
       @opt = opt
@@ -55,7 +56,7 @@ module Kompo
     extend Forwardable
     attr_reader :task, :fs, :work_dir, :ruby_src_dir, :ruby_pc, :ruby_bin, :extinit_o, :encinit_o, :lib_ruby_static_dir, :bundle_setup, :bundle_ruby, :std_libs, :gem_libs
 
-    delegate %i[entrypoint output gemfile stdlib dest_dir ruby_src_path cache_bundle_path ruby_version compress context args] => :@option
+    delegate %i[entrypoint output gemfile stdlib dest_dir ruby_src_path cache_bundle_path ruby_version compress context args use_group] => :@option
     delegate %i[komop_cli lib_kompo_dir] => :@fs
 
     def initialize(option, dir)
@@ -139,7 +140,7 @@ module Kompo
         command = [
           './bundler',
           'install',
-          '--standalone'
+          "--standalone=#{use_group}"
         ].join(' ')
 
         exec_command command, 'bundle install'

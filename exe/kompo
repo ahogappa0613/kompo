@@ -7,6 +7,7 @@ option = Kompo::Option.new
 
 option.on('-e VAL', '--entrypoint=VAL') { |v| option.entrypoint = v }
 option.on('-o VAL', '--output=VAL') { |v| option.output = v }
+option.on('-g', '--use-group=VAL') { |v| option.use_group = v }
 option.on('--[no-]gemfile') { |v| option.gemfile = v }
 option.on('--[no-]stdlib') { |v| option.stdlib = v }
 option.on('--dest-dir=VAL') { |v| option.dest_dir = v }
