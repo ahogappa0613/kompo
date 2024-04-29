@@ -264,10 +264,20 @@ module Kompo
       ["#{extinit_o}", "#{encinit_o}", *Dir.glob("#{ruby_src_dir}/ext/**/*.a"), *Dir.glob("#{ruby_src_dir}/enc/**/*.a")].join(' ')
     end
 
+    def extract_gem_libs
+      Dir.glob("bundle/ruby/#{get_semantic_ruby_version}/gems/*/ext/*/Makefile")
+         .flat_map{ File.read(_1)
+         .scan(/^LIBS = (.*)/)[0] }
+         .flat_map { _1.split(' ') }
+         .uniq
+         .flat_map { _1.start_with?("-l") ? _1 : "-l" + File.basename(_1, '.a').delete_prefix('lib') }
+         .join(" ")
+    end
+
     def get_libs
       main_lib = get_mainlibs
       ext_libs = Dir.glob("#{ruby_src_dir}/ext/**/exts.mk").flat_map { File.read(_1).scan(/EXTLIBS = (.*)/) }.join(" ")
-      gem_libs = Dir.glob("bundle/ruby/#{get_semantic_ruby_version}/gems/*/ext/*/Makefile").flat_map{ File.read(_1).scan(/LIBS = (.*)/)}.join(" ")
+      gem_libs = extract_gem_libs
       dyn, static = eval("%W[#{main_lib} #{ext_libs} #{gem_libs}]").uniq
                                                                    .partition { _1 == "-lpthread" || _1 == "-ldl" || _1 == "-lm" || _1 == "-lc" }
       dyn.unshift "-Wl,-Bdynamic"
