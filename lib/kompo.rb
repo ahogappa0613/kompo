@@ -36,7 +36,7 @@ module Kompo
       option = new
       option.on('-e VAL', '--entrypoint=VAL') { |v| option.entrypoint = v }
       option.on('-o VAL', '--output=VAL') { |v| option.output = v }
-      option.on('-g', '--use-group=VAL') { |v| option.use_group = v }
+      option.on('-g VAL', '--use-group=VAL') { |v| option.use_group = v }
       option.on('--[no-]gemfile') { |v| option.gemfile = v }
       option.on('--ignore-stdlib=VAL', Array) { |v| option.ignore_stdlib = v }
       option.on('--dyn-link-lib=VAL', Array) { |v| option.dyn_link_lib = v }
