@@ -12,7 +12,7 @@ module Kompo
 
   class Option
     extend Forwardable
-    attr_accessor :entrypoint, :output, :gemfile, :ignore_stdlib, :dest_dir, :ruby_src_path, :cache_bundle_path, :ruby_version, :compress, :context, :args, :use_group
+    attr_accessor :entrypoint, :output, :gemfile, :ignore_stdlib, :dyn_link_lib, :dest_dir, :ruby_src_path, :cache_bundle_path, :ruby_version, :compress, :context, :args, :use_group
     delegate %i[on] => :@opt
 
     def initialize(dir = Dir.getwd, opt = OptionParser.new)
@@ -20,6 +20,7 @@ module Kompo
       @output = File.basename(dir)
       @gemfile = File.exist?(File.join(Dir.getwd, 'Gemfile'))
       @ignore_stdlib = []
+      @dyn_link_lib = []
       @dest_dir = dir
       @ruby_src_path = nil
       @cache_bundle_path = nil
@@ -38,6 +39,7 @@ module Kompo
       option.on('-g', '--use-group=VAL') { |v| option.use_group = v }
       option.on('--[no-]gemfile') { |v| option.gemfile = v }
       option.on('--ignore-stdlib=VAL', Array) { |v| option.ignore_stdlib = v }
+      option.on('--dyn-link-lib=VAL', Array) { |v| option.dyn_link_lib = v }
       option.on('--dest-dir=VAL') { |v| option.dest_dir = v }
       option.on('--ruby-src-path=VAL') { |v| option.ruby_src_path = v }
       option.on('--cache-bundle-path=VAL') { |v| option.cache_bundle_path = v }
@@ -72,7 +74,7 @@ module Kompo
     extend Forwardable
     attr_reader :task, :fs, :work_dir, :ruby_src_dir, :ruby_pc, :ruby_bin, :extinit_o, :encinit_o, :lib_ruby_static_dir, :bundle_setup, :bundle_ruby, :std_libs, :gem_libs
 
-    delegate %i[entrypoint output gemfile ignore_stdlib dest_dir ruby_src_path cache_bundle_path ruby_version compress context args use_group] => :@option
+    delegate %i[entrypoint output gemfile ignore_stdlib dyn_link_lib dest_dir ruby_src_path cache_bundle_path ruby_version compress context args use_group] => :@option
     delegate %i[komop_cli lib_kompo_dir] => :@fs
 
     def initialize(option, dir)
@@ -278,8 +280,9 @@ module Kompo
       main_lib = get_mainlibs
       ext_libs = Dir.glob("#{ruby_src_dir}/ext/**/exts.mk").flat_map { File.read(_1).scan(/EXTLIBS = (.*)/) }.join(" ")
       gem_libs = extract_gem_libs
+      dyn_link_libs = (['pthread', 'dl', 'm', 'c'] + dyn_link_lib).map { "-l" + _1 }
       dyn, static = eval("%W[#{main_lib} #{ext_libs} #{gem_libs}]").uniq
-                                                                   .partition { _1 == "-lpthread" || _1 == "-ldl" || _1 == "-lm" || _1 == "-lc" }
+                                                                   .partition { dyn_link_libs.include?(_1) }
       dyn.unshift "-Wl,-Bdynamic"
       static.unshift "-Wl,-Bstatic"
 
