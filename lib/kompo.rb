@@ -83,14 +83,26 @@ module Kompo
       @work_dir = dir
       @fs = Fs.new
 
-      @ruby_pc = File.join(ruby_src_path || File.join(dir, 'dest_dir', 'lib', 'pkgconfig'), 'ruby.pc')
       @ruby_bin = File.join(ruby_src_path || File.join(dir, 'dest_dir', 'bin'), 'ruby')
+      @ruby_pc = File.join(ruby_src_path || File.join(dir, 'dest_dir', 'lib', 'pkgconfig'), get_ruby_pc_name)
       @extinit_o = File.join(ruby_src_dir, 'ext', 'extinit.o')
       @encinit_o = File.join(ruby_src_dir, 'enc', 'encinit.o')
       @lib_ruby_static_dir = ruby_src_path || File.join(dir, 'dest_dir', 'lib')
 
       @std_libs = []
       @gem_libs = []
+    end
+
+    def get_ruby_pc_name
+      return 'ruby.pc' unless ruby_src_path
+
+      command = [
+        ruby_bin,
+        '-e',
+        "'puts RbConfig::CONFIG[\"ruby_pc\"]'",
+      ].join(' ')
+
+      exec_command command, 'get ruby.pc name', true
     end
 
     def valid?
