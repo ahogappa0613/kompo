@@ -139,7 +139,7 @@ module Kompo
             "--disable-install-capi",
             "--with-static-linked-ext",
             "--with-ruby-pc=ruby.pc",
-            "--with-ext=#{get_exts_dir}"
+            "--with-ext=#{get_ruby_exts_dir}"
           ].join(' ')
           exec_command command, 'configure'
 
@@ -238,10 +238,7 @@ module Kompo
         'main.c',
         Dir.glob('exts/**/*.o').join(' '),
         'fs.o',
-        "#{lib_ruby_static_dir.nil? ? '' : '-L' + lib_ruby_static_dir}",
-        "#{lib_kompo_dir.nil? ? '' : '-L' + lib_kompo_dir}",
-        get_ruby_header,
-        get_exts,
+        get_ruby_exts,
         '-lkompo',
         '-lruby-static',
         get_libs,
@@ -274,8 +271,7 @@ module Kompo
       end
     end
 
-    def get_exts
-      ["#{extinit_o}", "#{encinit_o}", *Dir.glob("#{ruby_src_dir}/ext/**/*.a"), *Dir.glob("#{ruby_src_dir}/enc/**/*.a")].join(' ')
+    def get_ruby_exts
     end
 
     def extract_gem_libs
@@ -324,7 +320,7 @@ module Kompo
       load_paths
     end
 
-    def get_exts_dir
+    def get_ruby_exts_dir
       Dir.glob("#{ruby_src_dir}/**/extconf.rb")
          .reject { _1 =~ /-test-/ }
          .reject { _1 =~ /win32/ } # TODO
