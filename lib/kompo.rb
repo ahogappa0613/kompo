@@ -272,6 +272,17 @@ module Kompo
     end
 
     def get_ruby_exts
+      ["#{extinit_o}", "#{encinit_o}", *(Dir.glob("#{ruby_src_dir}/ext/**/*.a") - ignore_stdlib_archives), *Dir.glob("#{ruby_src_dir}/enc/**/*.a")].join(' ')
+    end
+
+    def ignore_stdlib_archives
+      if ruby_src_path
+        ignore_stdlib.map do |stdlib|
+          File.join(ruby_src_path, 'ext', stdlib, File.basename(stdlib) + '.a')
+        end
+      else
+        []
+      end
     end
 
     def extract_gem_libs
