@@ -72,7 +72,7 @@ module Kompo
 
   class Tasks
     extend Forwardable
-    attr_reader :task, :fs, :work_dir, :ruby_src_dir, :ruby_pc, :ruby_bin, :extinit_o, :encinit_o, :lib_ruby_static_dir, :bundle_setup, :bundle_ruby, :std_libs, :gem_libs
+    attr_reader :task, :fs, :work_dir, :ruby_src_dir, :ruby_pc, :ruby_bin, :extinit_o, :encinit_o, :lib_ruby_static_dir, :bundle_setup, :bundle_ruby, :std_libs, :gem_libs, :exts_libs
 
     delegate %i[entrypoint output gemfile ignore_stdlib dyn_link_lib dest_dir ruby_src_path cache_bundle_path ruby_version compress context args use_group] => :@option
     delegate %i[komop_cli lib_kompo_dir] => :@fs
@@ -91,6 +91,7 @@ module Kompo
 
       @std_libs = []
       @gem_libs = []
+      @exts_libs = []
     end
 
     def get_ruby_pc_name
@@ -213,10 +214,25 @@ module Kompo
             exec_command command, 'cargo build'
             copy_targets = Dir.glob(File.join(dir_name, 'target/release/*.a'))
           else
-            objs = File.read(makefile).scan(/OBJS = (.*\.o)/).join(' ')
-            command = ['make', '-C', dir_name, objs, '--always-make'].join(' ')
-            exec_command command, 'make'
-            copy_targets = objs.split(' ').map { File.join(dir_name, _1) }
+            copy_targets = []
+            Dir.chdir(dir_name) {|path|
+              command = [
+                ruby_bin,
+                'extconf.rb',
+              ].join(' ')
+
+              exec_command command, 'ruby extconf.rb'
+
+              objs = File.read('./Makefile').match(/OBJS = (.*\.o)/)[1]
+
+              command = ['make', objs, '--always-make'].join(' ')
+
+              exec_command command, 'make OBJS'
+
+              @exts_libs += File.read('./Makefile').match(/^libpath = (.*)/)[1].split(' ')
+
+              copy_targets = objs.split(' ').map { File.join(dir_name, _1) }
+            }
           end
 
           dir = FileUtils.mkdir_p('exts/' + File.basename(dir_name)).first
@@ -235,6 +251,7 @@ module Kompo
         'gcc',
         '-O3',
         '-Wall',
+        "#{exts_libs.uniq.select{_1.start_with?('/')}.map{"-L#{_1}"}.join(' ')}",
         'main.c',
         Dir.glob('exts/**/*.o').join(' '),
         'fs.o',
