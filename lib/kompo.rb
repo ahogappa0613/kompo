@@ -171,7 +171,7 @@ module Kompo
         command = [
           './bundler',
           'install',
-          "--standalone=#{use_group}"
+          "--standalone=#{use_group}",
         ].join(' ')
 
         exec_command command, 'bundle install'
