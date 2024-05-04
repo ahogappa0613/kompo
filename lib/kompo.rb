@@ -256,12 +256,14 @@ module Kompo
         "#{lib_kompo_dir.nil? ? '' : '-L' + lib_kompo_dir}",
         "#{exts_libs.uniq.select{_1.start_with?('/')}.map{"-L#{_1}"}.join(' ')}",
         'main.c',
+        '-Wl,--start-group',
         Dir.glob('exts/**/*.o').join(' '),
         'fs.o',
         get_ruby_exts,
         '-lkompo',
         '-lruby-static',
         get_libs,
+        '-Wl,--end-group',
         '-o',
         output
       ].join(' ')
