@@ -26,7 +26,7 @@ module Kompo
       @cache_bundle_path = nil
       @ruby_version = "v#{RUBY_VERSION.gsub('.', '_')}"
       @compress = false
-      @use_group = 'production'
+      @use_group = 'default'
 
       @context = dir
       @opt = opt
