@@ -20,11 +20,15 @@ void <%= "Init_#{stdlib.gsub('/', '_')}" %>(void){}
 
 int main(int argc, char **argv)
 {
-  int c = 3;
+  int c = argc + 2;
+  char *argv2[c];
 
-  // HACK: argv[0] is rewritten and reused by setproctitle()
-  argv[1] = "-e";
-  argv[2] = get_kompo_patch();
+  argv2[0] = argv[0];
+  argv2[1] = "-e";
+  argv2[2] = get_kompo_patch();
+  for (int i = 1; i < argc; i++) {
+    argv2[i + 2] = argv[i];
+  }
 
   ruby_sysinit(&c, &argv);
 
@@ -34,7 +38,7 @@ int main(int argc, char **argv)
   Init_kompo_fs();
   Init_gems();
 
-  void *node = ruby_options(c, argv);
+  void *node = ruby_options(c, argv2);
 
   // set $0
   ruby_script(get_start_file_name());
