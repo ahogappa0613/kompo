@@ -16,7 +16,7 @@ void Init_gems(void)
 }
 <% ignore_stdlib.each do |stdlib|%>
 void <%= "Init_#{stdlib.gsub('/', '_')}" %>(void){}
-<%end%>
+<% end %>
 
 int main(int argc, char **argv)
 {
