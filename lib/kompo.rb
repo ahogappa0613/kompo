@@ -34,16 +34,16 @@ module Kompo
 
     def self.default
       option = new
-      option.on('-e VAL', '--entrypoint=VAL') { |v| option.entrypoint = v }
-      option.on('-o VAL', '--output=VAL') { |v| option.output = v }
-      option.on('-g VAL', '--use-group=VAL') { |v| option.use_group = v }
-      option.on('--[no-]gemfile') { |v| option.gemfile = v }
-      option.on('--ignore-stdlib=VAL', Array) { |v| option.ignore_stdlib = v }
-      option.on('--dyn-link-lib=VAL', Array) { |v| option.dyn_link_lib = v }
-      option.on('--dest-dir=VAL') { |v| option.dest_dir = v }
-      option.on('--ruby-src-path=VAL') { |v| option.ruby_src_path = v }
-      option.on('--cache-bundle-path=VAL') { |v| option.cache_bundle_path = v }
-      option.on('--ruby-version=VAL') { |v| option.ruby_version = v }
+      option.on('-e VAL', '--entrypoint=VAL', "File path to use for entry point. (default: \'./main.rb\')") { |v| option.entrypoint = v }
+      option.on('-o VAL', '--output=VAL', 'Name of the generated file. (default: current dir name)') { |v| option.output = v }
+      option.on('-g VAL', '--use-group=VAL', "Group name to use with \'bundle install\'. (default: \'default\')") { |v| option.use_group = v }
+      option.on('--[no-]gemfile', "Use gem in Gemfile. (default: automatically true if Gemfile is present)") { |v| option.gemfile = v }
+      option.on('--ignore-stdlib=VAL', Array, "Specify stdlibs not to include, separated by commas.") { |v| option.ignore_stdlib = v }
+      option.on('--dyn-link-lib=VAL', Array, "Specify libraries to be dynamic link, separated by commas.") { |v| option.dyn_link_lib = v }
+      option.on('--dest-dir=VAL', "Output directry path. (default: current dir)") { |v| option.dest_dir = v }
+      option.on('--ruby-src-path=VAL', "Your Ruby source directry. Must be compiled with \'--with-static-linked-ext\'.") { |v| option.ruby_src_path = v }
+      option.on('--cache-bundle-path=VAL', "Specify the directory created by \'bundle install --standalone\'.") { |v| option.cache_bundle_path = v }
+      option.on('--ruby-version=VAL', "Specify Ruby version. (default: current Ruby version)") { |v| option.ruby_version = v }
       # option.on('--compress') { |v| option.compress = v }
 
       option
