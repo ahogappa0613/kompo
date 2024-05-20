@@ -108,7 +108,7 @@ module Kompo
 
     def valid?
       raise "kompo-cli not found. Please install 'kompo-cli'." unless komop_cli
-      raise "libkompo_fs.a not found. Please install 'kompo-cli'." unless lib_kompo_dir
+      raise "libkompo.a not found. Please install 'kompo-cli'." unless lib_kompo_dir
       raise "Entrypoint not found: '#{entrypoint}'. Please specify the entry file path with '-e' or '--entrypoint' option." unless File.exist?(entrypoint)
 
       true
