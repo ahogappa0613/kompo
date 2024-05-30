@@ -134,6 +134,7 @@ module Kompo
 
           command = [
             './configure',
+            get_cofigure_option_from_env,
             "--prefix=#{work_dir}/dest_dir",
             "--disable-install-doc",
             "--disable-install-rdoc",
@@ -147,6 +148,10 @@ module Kompo
           exec_command ['make', 'install'].join(' '), 'build target version ruby'
         end
       end
+    end
+
+    def get_cofigure_option_from_env
+      return ENV['CONFIGURE_OPTS'] if ENV['CONFIGURE_OPTS']
     end
 
     def get_from_ruby_pc(option)
