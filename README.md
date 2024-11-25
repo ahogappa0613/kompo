@@ -9,7 +9,7 @@ $ gem install kompo
 ## Usage
 
 ### prerequisites
-Install [komp-vfs](https://github.com/ahogappa0613/kompo-vfs).
+Install [kompo-vfs](https://github.com/ahogappa0613/kompo-vfs).
 
 #### Homebrew
 ```sh
